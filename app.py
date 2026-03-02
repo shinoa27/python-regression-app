@@ -117,11 +117,6 @@ else:
 st.divider()
 st.subheader("👁️ 系統造訪統計")
 
-# 改用純 HTML 語法與簡化的專屬 ID，確保圖片穩定載入
-html_code = """
-<a href="https://hits.seeyoufarm.com" target="_blank">
-    <img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=python-regression-app-bwrqbrfnjvarjdk9juncjl.streamlit.app&count_bg=%2379C83D&title_bg=%23555555&title=VISITS&edge_flat=false" alt="系統造訪統計">
-</a>
-"""
-
-st.markdown(html_code, unsafe_allow_html=True)
+# 改用更穩定的 visitorbadge 服務，並使用 Streamlit 原生的 st.image 渲染
+# path 參數後面只需要放您專屬的獨特字串即可
+st.image("https://api.visitorbadge.io/api/visitors?path=python-regression-app-bwrqbrfnjvarjdk9juncjl&label=VISITS&countColor=%2379C83D")
