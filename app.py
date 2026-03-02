@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-# --- 1. 核心演算法 ---
+# 核心演算法
 def calculate_statistics(x_list, y_list):
     n = len(x_list)
     if n == 0: return 0.0, 0.0, 0.0
@@ -21,7 +21,7 @@ def calculate_statistics(x_list, y_list):
     c = mean_y - m * mean_x
     return r_value, m, c
 
-# --- 初始化系統記憶體 (State Management) ---
+# 初始化系統記憶體 (State Management)
 if 'model_ready' not in st.session_state:
     st.session_state.model_ready = False
 if 'history' not in st.session_state:
@@ -29,7 +29,7 @@ if 'history' not in st.session_state:
 if 'default_data' not in st.session_state:
     st.session_state.default_data = pd.DataFrame({"X 軸數據": [1.0, 2.0, 3.0, 4.0, 5.0], "Y 軸數據": [2.0, 4.0, 5.0, 4.0, 5.0]})
 
-# 【重要修正】預先為所有計算變數建立空位，徹底防範 KeyError
+# 預先為所有計算變數建立空位，防範 KeyError
 for key in ['m', 'c', 'r_value']:
     if key not in st.session_state:
         st.session_state[key] = 0.0
@@ -37,14 +37,14 @@ for key in ['x_data', 'y_data']:
     if key not in st.session_state:
         st.session_state[key] = []
 
-# --- 2. 網頁介面設計 ---
+# 網頁介面設計
 st.title("二維數據統計與預測實驗室")
 st.write("本系統完全以 Python 基礎迴圈實作皮爾森相關係數與最小平方法運算，並具備機器學習預測與歷史紀錄功能。")
 
 st.subheader("✍️ 數據輸入區")
 edited_df = st.data_editor(st.session_state.default_data, num_rows="dynamic", use_container_width=True)
 
-# --- 3. 訓練模型按鈕 ---
+# 訓練模型按鈕
 if st.button("開始訓練模型與計算"):
     try:
         clean_df = edited_df.dropna()
@@ -67,7 +67,7 @@ if st.button("開始訓練模型與計算"):
     except Exception as e:
         st.error(f"系統發生錯誤：({e})")
 
-# --- 4. 顯示結果、圖表與預測區塊 ---
+# 顯示結果、圖表與預測區塊
 if st.session_state.model_ready:
     st.success("模型訓練成功！")
     m = st.session_state['m']
@@ -89,7 +89,7 @@ if st.session_state.model_ready:
 
     st.divider()
 
-    # --- 5. 機器學習預測引擎與歷史紀錄 ---
+    # 機器學習預測引擎與歷史紀錄
     st.subheader("數據預測")
     st.write(f"目前套用模型：**y = {m:.2f}x + {c:.2f}**")
     
@@ -113,7 +113,7 @@ if st.session_state.model_ready:
 else:
     st.warning("請先在上方的資料表輸入數據，並點擊「開始訓練模型與計算」按鈕。")
 
-# --- 6. 網頁瀏覽計數器 ---
+# 網頁瀏覽計數器
 st.divider()
 st.subheader("系統造訪統計")
 
