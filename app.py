@@ -25,9 +25,17 @@ def calculate_statistics(x_list, y_list):
 if 'model_ready' not in st.session_state:
     st.session_state.model_ready = False
 if 'history' not in st.session_state:
-    st.session_state.history = [] # 用來存預測歷史的空清單
+    st.session_state.history = [] 
 if 'default_data' not in st.session_state:
     st.session_state.default_data = pd.DataFrame({"X 軸數據": [1.0, 2.0, 3.0, 4.0, 5.0], "Y 軸數據": [2.0, 4.0, 5.0, 4.0, 5.0]})
+
+# 【重要修正】預先為所有計算變數建立空位，徹底防範 KeyError
+for key in ['m', 'c', 'r_value']:
+    if key not in st.session_state:
+        st.session_state[key] = 0.0
+for key in ['x_data', 'y_data']:
+    if key not in st.session_state:
+        st.session_state[key] = []
 
 # --- 2. 網頁介面設計 ---
 st.title("多維數據統計與預測實驗室")
@@ -48,19 +56,18 @@ if st.button("開始訓練模型與計算"):
         else:
             r_value, m, c = calculate_statistics(x_data, y_data)
             
-            # 將所有畫圖與運算需要的素材存入記憶體
             st.session_state['m'] = m
             st.session_state['c'] = c
             st.session_state['r_value'] = r_value
             st.session_state['x_data'] = x_data
             st.session_state['y_data'] = y_data
             st.session_state.model_ready = True
-            st.session_state.history = [] # 重新訓練時清空舊歷史
+            st.session_state.history = [] 
             
     except Exception as e:
         st.error(f"系統發生錯誤：({e})")
 
-# --- 4. 顯示結果、圖表與預測區塊 (獨立於按鈕之外) ---
+# --- 4. 顯示結果、圖表與預測區塊 ---
 if st.session_state.model_ready:
     st.success("模型訓練成功！")
     m = st.session_state['m']
@@ -73,7 +80,6 @@ if st.session_state.model_ready:
     col_res1.metric(label="皮爾森相關係數 (r)", value=f"{r_value:.4f}")
     col_res2.metric(label="回歸直線方程式", value=f"y = {m:.2f}x + {c:.2f}")
     
-    # 繪製圖表
     st.subheader("📈 數據分佈與最小平方法回歸線")
     fig = px.scatter(x=x_data, y=y_data, labels={'x': 'X 軸數據', 'y': 'Y 軸數據'})
     fig.update_traces(marker=dict(size=12, color='#1f77b4', line=dict(width=2, color='DarkSlateGrey')), name="真實數據點")
@@ -95,13 +101,11 @@ if st.session_state.model_ready:
     st.info(f"📌 當 X = {predict_x} 時，模型預測的 Y 值為：**{predicted_y:.2f}**")
     
     with col_btn:
-        st.write("") # 排版對齊用
+        st.write("") 
         st.write("")
         if st.button("💾 儲存預測結果"):
-            # 將預測結果寫入歷史紀錄的清單中
             st.session_state.history.append({"輸入的未知 X": predict_x, "模型預測的 Y": round(predicted_y, 2)})
     
-    # 顯示歷史紀錄表格
     if st.session_state.history:
         st.write("📋 **預測歷史紀錄**")
         st.dataframe(pd.DataFrame(st.session_state.history), use_container_width=True)
@@ -113,7 +117,6 @@ else:
 st.divider()
 st.subheader("👁️ 系統造訪統計")
 
-# 已為您客製化編碼的專屬計數器 API 
 st.markdown(
     "[![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fpython-regression-app-bwrqbrfnjvarjdk9juncjl.streamlit.app&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=VISITS&edge_flat=false)](https://hits.seeyoufarm.com)",
     unsafe_allow_html=True
