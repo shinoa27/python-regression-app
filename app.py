@@ -41,7 +41,7 @@ for key in ['x_data', 'y_data']:
 st.title("二維數據統計與預測實驗室")
 st.write("本系統完全以 Python 基礎迴圈實作皮爾森相關係數與最小平方法運算，並具備機器學習預測與歷史紀錄功能。")
 
-st.subheader("✍️ 數據輸入區")
+st.subheader("數據輸入區")
 edited_df = st.data_editor(st.session_state.default_data, num_rows="dynamic", use_container_width=True)
 
 # 訓練模型按鈕
@@ -80,7 +80,7 @@ if st.session_state.model_ready:
     col_res1.metric(label="皮爾森相關係數 (r)", value=f"{r_value:.4f}")
     col_res2.metric(label="回歸直線方程式", value=f"y = {m:.2f}x + {c:.2f}")
     
-    st.subheader("📈 數據分佈與最小平方法回歸線")
+    st.subheader("數據分佈與最小平方法回歸線")
     fig = px.scatter(x=x_data, y=y_data, labels={'x': 'X 軸數據', 'y': 'Y 軸數據'})
     fig.update_traces(marker=dict(size=12, color='#1f77b4', line=dict(width=2, color='DarkSlateGrey')), name="真實數據點")
     x_min, x_max = min(x_data), max(x_data)
