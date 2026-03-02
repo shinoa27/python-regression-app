@@ -38,10 +38,10 @@ for key in ['x_data', 'y_data']:
         st.session_state[key] = []
 
 # --- 2. 網頁介面設計 ---
-st.title("多維數據統計與預測實驗室")
+st.title("二維數據統計與預測實驗室")
 st.write("本系統完全以 Python 基礎迴圈實作皮爾森相關係數與最小平方法運算，並具備機器學習預測與歷史紀錄功能。")
 
-st.subheader("✍️ 動態數據輸入區")
+st.subheader("✍️ 數據輸入區")
 edited_df = st.data_editor(st.session_state.default_data, num_rows="dynamic", use_container_width=True)
 
 # --- 3. 訓練模型按鈕 ---
@@ -90,7 +90,7 @@ if st.session_state.model_ready:
     st.divider()
 
     # --- 5. 機器學習預測引擎與歷史紀錄 ---
-    st.subheader("🔮 機器學習預測引擎")
+    st.subheader("數據預測")
     st.write(f"目前套用模型：**y = {m:.2f}x + {c:.2f}**")
     
     col_input, col_btn = st.columns([3, 1])
@@ -103,11 +103,11 @@ if st.session_state.model_ready:
     with col_btn:
         st.write("") 
         st.write("")
-        if st.button("💾 儲存預測結果"):
+        if st.button("儲存預測結果"):
             st.session_state.history.append({"輸入的未知 X": predict_x, "模型預測的 Y": round(predicted_y, 2)})
     
     if st.session_state.history:
-        st.write("📋 **預測歷史紀錄**")
+        st.write("**預測歷史紀錄**")
         st.dataframe(pd.DataFrame(st.session_state.history), use_container_width=True)
 
 else:
@@ -115,7 +115,7 @@ else:
 
 # --- 6. 網頁瀏覽計數器 ---
 st.divider()
-st.subheader("👁️ 系統造訪統計")
+st.subheader("系統造訪統計")
 
 # 改用更穩定的 visitorbadge 服務，並使用 Streamlit 原生的 st.image 渲染
 # path 參數後面只需要放您專屬的獨特字串即可
