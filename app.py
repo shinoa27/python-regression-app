@@ -108,3 +108,16 @@ if st.session_state.model_ready:
 
 else:
     st.warning("請先在上方的資料表輸入數據，並點擊「開始訓練模型與計算」按鈕。")
+
+# --- 6. 網頁瀏覽計數器 ---
+st.divider()
+st.subheader("👁️ 系統造訪統計")
+
+# 請替換成你專屬的識別碼 (例如你的 GitHub 帳號/專案名稱)
+TARGET_ID = "shinoa/python-regression-app" 
+
+# 使用 st.markdown 渲染外部 API 產生的 SVG 圖片
+st.markdown(
+    f"[![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2F{TARGET_ID}&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)](https://hits.seeyoufarm.com)",
+    unsafe_allow_html=True,
+)
