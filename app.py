@@ -117,7 +117,11 @@ else:
 st.divider()
 st.subheader("👁️ 系統造訪統計")
 
-st.markdown(
-    "[![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fpython-regression-app-bwrqbrfnjvarjdk9juncjl.streamlit.app&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=VISITS&edge_flat=false)](https://hits.seeyoufarm.com)",
-    unsafe_allow_html=True
-)
+# 改用純 HTML 語法與簡化的專屬 ID，確保圖片穩定載入
+html_code = """
+<a href="https://hits.seeyoufarm.com" target="_blank">
+    <img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=python-regression-app-bwrqbrfnjvarjdk9juncjl.streamlit.app&count_bg=%2379C83D&title_bg=%23555555&title=VISITS&edge_flat=false" alt="系統造訪統計">
+</a>
+"""
+
+st.markdown(html_code, unsafe_allow_html=True)
