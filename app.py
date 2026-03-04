@@ -248,7 +248,7 @@ st.markdown(
     <hr style='margin-top: 2em; margin-bottom: 1em;'>
     <div style='text-align: center; color: #888888; font-size: 13px;'>
         <i>系統版本 v1.0 (Beta) — 專為學術展示與數據預測設計。</i><br>
-        <i>開發者保有隨時更新系統功能與演算法之權利。</i>
+        <i>開發者保有隨時更新系統功能與演算法之權利。Gmail: 210163@fhsh.khc.edu.tw</i>
     </div>
     """, 
     unsafe_allow_html=True
