@@ -33,11 +33,17 @@ if 'clean_data' not in st.session_state:
 if 'user_notes' not in st.session_state:
     st.session_state.user_notes = "" 
 
-# 支援多組獨立資料表的記憶體結構
+# 【新增】動態變數：儲存自訂的 X 與 Y 軸名稱
+if 'x_name' not in st.session_state:
+    st.session_state.x_name = "X 軸數據"
+if 'y_name' not in st.session_state:
+    st.session_state.y_name = "Y 軸數據"
+
+# 支援多組獨立資料表的記憶體結構 (使用動態變數)
 if 'group_data' not in st.session_state:
     st.session_state.group_data = {
-        "A組": pd.DataFrame({"X 軸數據": [1.0, 2.0, 3.0], "Y 軸數據": [2.0, 4.0, 5.0]}),
-        "B組": pd.DataFrame({"X 軸數據": [1.5, 2.5, 3.5], "Y 軸數據": [1.0, 3.0, 4.5]})
+        "A組": pd.DataFrame({st.session_state.x_name: [1.0, 2.0, 3.0], st.session_state.y_name: [2.0, 4.0, 5.0]}),
+        "B組": pd.DataFrame({st.session_state.x_name: [1.5, 2.5, 3.5], st.session_state.y_name: [1.0, 3.0, 4.5]})
     }
 
 for key in ['m', 'c', 'r_value']:
@@ -49,14 +55,42 @@ for key in ['x_data', 'y_data']:
 
 st.title("多維數據對比與預測實驗室")
 
-# 【新增】頂部開發者微型宣告
-st.caption("開發者備註：本系統目前仍處於 Beta 測試階段，作為學術展示用途，演算法與介面將持續迭代優化。")
+# 頂部開發者微型宣告
+st.caption("👨‍💻 開發者備註：本系統目前仍處於 Beta 測試階段，作為學術展示用途，演算法與介面將持續迭代優化。")
 
 st.write("本系統支援多組數據建檔、客製化圖表渲染，並可針對獨立數據組進行迴歸預測。")
 
 # 區塊 1：數據分組輸入與管理
 st.subheader("1. 數據分組輸入區")
 
+# 【新增】自訂資料變數名稱區塊
+with st.container(border=True):
+    st.markdown("###### ⚙️ 自訂數據名稱")
+    col_x_name, col_y_name, col_name_btn = st.columns([2, 2, 1])
+    with col_x_name:
+        new_x = st.text_input("定義 X 軸數據名稱", value=st.session_state.x_name)
+    with col_y_name:
+        new_y = st.text_input("定義 Y 軸數據名稱", value=st.session_state.y_name)
+    with col_name_btn:
+        st.write("") 
+        st.write("")
+        if st.button("🔄 更新變數名稱", use_container_width=True):
+            if not new_x.strip() or not new_y.strip():
+                st.error("名稱不可為空白！")
+            elif new_x == new_y:
+                st.error("X 軸與 Y 軸名稱不可重複！")
+            elif new_x != st.session_state.x_name or new_y != st.session_state.y_name:
+                # 同步更新所有既存資料表的欄位名稱
+                for group in st.session_state.group_data:
+                    st.session_state.group_data[group] = st.session_state.group_data[group].rename(
+                        columns={st.session_state.x_name: new_x, st.session_state.y_name: new_y}
+                    )
+                st.session_state.x_name = new_x
+                st.session_state.y_name = new_y
+                st.session_state.model_ready = False # 變更架構需重新訓練模型
+                st.rerun()
+
+# 新增組別介面
 col_new_name, col_new_btn = st.columns([3, 1])
 with col_new_name:
     new_group_name = st.text_input("新增組別", label_visibility="collapsed", placeholder="請輸入新組別名稱 (例如：實驗C組)")
@@ -67,7 +101,7 @@ with col_new_btn:
         elif new_group_name in st.session_state.group_data:
             st.warning("此組別名稱已存在，請更換名稱。")
         else:
-            st.session_state.group_data[new_group_name] = pd.DataFrame({"X 軸數據": [0.0], "Y 軸數據": [0.0]})
+            st.session_state.group_data[new_group_name] = pd.DataFrame({st.session_state.x_name: [0.0], st.session_state.y_name: [0.0]})
             st.rerun()
 
 for group_name in list(st.session_state.group_data.keys()):
@@ -109,8 +143,8 @@ if st.button("開始訓練分組模型", type="primary"):
             
             for group_name, df in st.session_state.group_data.items():
                 clean_df = df.dropna().copy()
-                x_data = clean_df["X 軸數據"].tolist()
-                y_data = clean_df["Y 軸數據"].tolist()
+                x_data = clean_df[st.session_state.x_name].tolist()
+                y_data = clean_df[st.session_state.y_name].tolist()
                 
                 if len(x_data) >= 2:
                     r_value, m, c = calculate_statistics(x_data, y_data)
@@ -156,7 +190,7 @@ if st.session_state.model_ready:
 
         if chart_type == "散佈圖+迴歸線":
             fig = px.scatter(
-                plot_df, x="X 軸數據", y="Y 軸數據", color="數據組名稱", 
+                plot_df, x=st.session_state.x_name, y=st.session_state.y_name, color="數據組名稱", 
                 title=custom_title, color_discrete_map=color_map
             )
             fig.update_traces(marker=dict(size=10, line=dict(width=1, color='DarkSlateGrey')))
@@ -182,7 +216,7 @@ if st.session_state.model_ready:
 
         elif chart_type == "柱狀圖":
             fig = px.bar(
-                plot_df, x="X 軸數據", y="Y 軸數據", color="數據組名稱",
+                plot_df, x=st.session_state.x_name, y=st.session_state.y_name, color="數據組名稱",
                 barmode="group", title=custom_title, color_discrete_map=color_map
             )
             st.plotly_chart(fig, use_container_width=True)
@@ -204,10 +238,10 @@ if st.session_state.model_ready:
         
         col_input, col_btn = st.columns([3, 1])
         with col_input:
-            predict_x = st.number_input("請輸入未知的 X 數值：", value=0.0, step=1.0)
+            predict_x = st.number_input(f"請輸入未知的 {st.session_state.x_name} 數值：", value=0.0, step=1.0)
         
         predicted_y = m * predict_x + c
-        st.info(f"📌 當 X = {predict_x} 時，**{target_model_name}** 模型預測的 Y 值為：**{predicted_y:.2f}**")
+        st.info(f"📌 當 {st.session_state.x_name} = {predict_x} 時，**{target_model_name}** 模型預測的 {st.session_state.y_name} 值為：**{predicted_y:.2f}**")
         
         with col_btn:
             st.write("") 
@@ -215,8 +249,8 @@ if st.session_state.model_ready:
             if st.button("儲存預測結果"):
                 st.session_state.history.append({
                     "使用模型": target_model_name,
-                    "輸入的未知 X": predict_x, 
-                    "模型預測的 Y": round(predicted_y, 2)
+                    f"輸入的未知 {st.session_state.x_name}": predict_x, 
+                    f"模型預測的 {st.session_state.y_name}": round(predicted_y, 2)
                 })
         
         if st.session_state.history:
@@ -242,7 +276,7 @@ col_badge1, col_badge2 = st.columns([1, 4])
 with col_badge1:
     st.image("https://api.visitorbadge.io/api/visitors?path=python-regression-app-bwrqbrfnjvarjdk9juncjl&label=VISITS&countColor=%2379C83D")
 
-# 【新增】網頁最底部的開發者註腳 (Footer)
+# 網頁最底部的開發者註腳 (Footer)
 st.markdown(
     """
     <hr style='margin-top: 2em; margin-bottom: 1em;'>
